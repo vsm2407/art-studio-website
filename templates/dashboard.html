@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | Art Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="dashboard-wrap">
+        <header class="topbar">
+            <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">✿</span> Art Studio</a>
+            <nav>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('paintings') }}">Paintings</a>
+                {% if user.get('role') == 'customer' %}
+                    <a href="{{ url_for('wall_painting') }}">Wall painting</a><a href="{{ url_for('pottery') }}">Pottery</a>
+                {% else %}
+                    <a href="{{ url_for('admin_bookings') }}">Bookings</a><a href="{{ url_for('admin_pottery') }}">Pottery requests</a>
+                {% endif %}
+                <form method="post" action="{{ url_for('logout') }}" style="display:inline"><button type="submit">Log out</button></form>
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}<div class="flash-list">{% for category, message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+        {% endwith %}
+
+        {% if user.get('role') == 'admin' %}
+            <section class="welcome-banner"><div><p style="text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:700;color:#ad6c15">Studio management</p><h1>Welcome back, {{ user.get('name') }}.</h1><p>Manage requests, coordinate bookings, and keep the studio running smoothly.</p></div></section>
+            <div class="admin-links">
+                <a href="{{ url_for('admin_bookings') }}"><h2>Wall-painting bookings ↗</h2><p>Review, confirm, or decline booking requests.</p></a>
+                <a href="{{ url_for('admin_pottery') }}"><h2>Custom pottery requests ↗</h2><p>Review and respond to customer pottery requests.</p></a>
+                <a href="{{ url_for('paintings') }}"><h2>Painting collection ↗</h2><p>Browse the studio's artwork catalogue.</p></a>
+            </div>
+        {% else %}
+            <section class="welcome-banner">
+                <div><p style="text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:700;color:#ad6c15">Your creative corner</p><h1>Welcome back,<br><span style="color:#bd7610">{{ user.get('name') }}.</span></h1><p>Explore art, refresh your walls, or request something handmade just for you.</p></div>
+                <div style="max-width:330px;padding:24px;border-radius:22px;background:#f7df9c;border:1px solid #edcf78"><p style="font-family:'Playfair Display',serif;font-size:1.45rem;color:#603718;margin:0">“Art makes a house feel like your own.”</p></div>
+            </section>
+            <section class="dashboard-grid">
+                <article class="dashboard-card"><img src="{{ url_for('static', filename='images/p-001.jpg') }}" alt="Original painting"><div class="copy"><h2>Browse paintings</h2><p>Discover one-of-a-kind artworks to bring character to your space.</p><a class="button" href="{{ url_for('paintings') }}">View paintings →</a></div></article>
+                <article class="dashboard-card"><img src="{{ url_for('static', filename='images/p-005.jpg') }}" alt="Artwork inspiration"><div class="copy"><h2>Book wall painting</h2><p>Turn a blank wall into a personal work of art.</p><a class="button" href="{{ url_for('wall_painting') }}">Book a date →</a></div></article>
+                <article class="dashboard-card"><img src="{{ url_for('static', filename='images/p-010.jpg') }}" alt="Art detail"><div class="copy"><h2>Request custom pottery</h2><p>Choose a form and glaze for a personalised pottery request.</p><a class="button" href="{{ url_for('pottery') }}">Make a request →</a></div></article>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

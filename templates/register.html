@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create account | Art Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-story">
+            <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">✿</span> Art Studio</a>
+            <h1>Your next<br><span>favourite thing</span><br>starts here.</h1>
+            <p>Create an account to discover original art, book wall painting, and request custom pottery.</p>
+            <div class="service-pills"><span>Made with care</span><span>One-of-a-kind art</span><span>Personalised pieces</span></div>
+        </section>
+        <section class="auth-card">
+            <div class="brand"><span class="brand-mark">✿</span> Art Studio</div>
+            <h2>Create your account</h2><p>Join the studio and make room for creativity.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}<div class="flash-list">{% for category, message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+            {% endwith %}
+            <form method="post">
+                <label for="name">Full name</label>
+                <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required maxlength="100">
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="255">
+                <label for="password">Password <span style="font-weight:400">(minimum 8 characters)</span></label>
+                <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required>
+                <button type="submit">Create account →</button>
+            </form>
+            <div class="auth-links">Already registered? <a href="{{ url_for('login') }}">Log in</a><br><a class="back-home" href="{{ url_for('home') }}">← Back to home</a></div>
+        </section>
+    </main>
+</body>
+</html>

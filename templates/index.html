@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Art Studio | Create. Decorate. Personalise.</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="site-nav">
+        <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">✿</span> Art Studio</a>
+        <div class="links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="#services">Our services</a>
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <form method="post" action="{{ url_for('logout') }}" style="display:inline"><button type="submit">Log out</button></form>
+            {% else %}
+                <a href="{{ url_for('login') }}">Log in</a>
+                <a class="button" href="{{ url_for('register') }}">Create account</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-list">{% for category, message in messages %}<p role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+    {% endwith %}
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="brand" style="color:#fff2d9"><span class="brand-mark">✿</span> HANDMADE WITH HEART</div>
+                <h1>Welcome to<br><span>Art Studio</span></h1>
+                <p>Discover one-of-a-kind paintings, bring your walls to life, and request pottery made just for you.</p>
+                {% if session.get('user_id') %}
+                    <a class="button" href="{{ url_for('dashboard') }}">Go to your dashboard →</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('register') }}">Explore the studio →</a>
+                    <a class="button secondary" href="{{ url_for('login') }}">I have an account</a>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="section-wrap" id="services">
+            <div class="section-heading">
+                <div><p style="text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:700;color:#ad6c15">Made to be meaningful</p><h2>Art for the way you live</h2></div>
+                <p>Find something beautiful. Make it yours.</p>
+            </div>
+            <div class="service-grid">
+                <article class="service-card">
+                    <img src="{{ url_for('static', filename='images/p-001.jpg') }}" alt="Hand-painted artwork">
+                    <div class="service-copy"><h3>Original paintings</h3><p>Explore unique traditional and contemporary artworks, each with its own story.</p><a class="button" href="{{ url_for('paintings') if session.get('user_id') else url_for('login') }}">Browse paintings →</a></div>
+                </article>
+                <article class="service-card">
+                    <img src="{{ url_for('static', filename='images/p-005.jpg') }}" alt="Decorative art inspiration">
+                    <div class="service-copy"><h3>Wall painting</h3><p>Turn an everyday wall into a personal space with a made-to-order mural.</p><a class="button" href="{{ url_for('wall_painting') if session.get('user_id') else url_for('login') }}">Book a wall →</a></div>
+                </article>
+                <article class="service-card">
+                    <img src="{{ url_for('static', filename='images/p-010.jpg') }}" alt="Handcrafted art detail">
+                    <div class="service-copy"><h3>Custom pottery</h3><p>Choose your favourite form, glaze, quantity, and the date you need it.</p><a class="button" href="{{ url_for('pottery') if session.get('user_id') else url_for('login') }}">Request pottery →</a></div>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

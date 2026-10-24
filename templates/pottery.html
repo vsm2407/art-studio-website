@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Custom Pottery | Art Studio</title>
+    <style>
+        body {
+            max-width: 1050px;
+            margin: 35px auto;
+            padding: 0 20px;
+            font-family: Arial, sans-serif;
+            color: #302820;
+            background: #faf8f5;
+        }
+        .panel {
+            background: white;
+            border: 1px solid #e5ddd5;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #cfc5bb;
+            border-radius: 6px;
+        }
+        button {
+            margin-top: 16px;
+            padding: 11px 16px;
+            background: #963c35;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .secondary { background: #5f554b; }
+        .message { padding: 12px; background: #eee7dc; border-radius: 6px; }
+        .request {
+            padding: 18px 0;
+            border-bottom: 1px solid #e5ddd5;
+        }
+        .request:last-child { border-bottom: 0; }
+        .inline-form { margin-top: 14px; }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+        <a href="{{ url_for('paintings') }}">Paintings</a> |
+        <a href="{{ url_for('wall_painting') }}">Wall painting</a>
+    </nav>
+
+    <h1>Custom Pottery</h1>
+    <p>Choose your pottery, glaze, quantity, and required-by date.</p>
+    <p>Requests are reviewed by the studio. No pottery prices are displayed because the dataset does not specify them.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p class="message" role="status">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="panel">
+        <h2>Make a pottery request</h2>
+
+        {% if items and glazes %}
+        <form method="post" action="{{ url_for('pottery') }}">
+            <label for="item_id">Pottery item</label>
+            <select id="item_id" name="item_id" required>
+                {% for item in items %}
+                <option value="{{ item.id }}">{{ item.item_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="glaze_id">Glaze</label>
+            <select id="glaze_id" name="glaze_id" required>
+                {% for glaze in glazes %}
+                <option value="{{ glaze.id }}">{{ glaze.glaze_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="quantity">Quantity (1–12)</label>
+            <input id="quantity" name="quantity" type="number"
+                   min="1" max="12" value="1" required>
+
+            <label for="needed_by">Required by</label>
+            <input id="needed_by" name="needed_by" type="date"
+                   min="{{ today_plus_14 }}" required>
+
+            <button type="submit">Submit request</button>
+        </form>
+        {% else %}
+            <p>Pottery items or glazes are not available right now.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Your pottery requests</h2>
+
+        {% if requests %}
+            {% for r in requests %}
+            <div class="request">
+                <h3>Request #{{ r.id }} — {{ r.item_name }}</h3>
+                <p>Glaze: {{ r.glaze_name }}</p>
+                <p>Quantity: {{ r.quantity }}</p>
+                <p>Required by: {{ r.needed_by.strftime('%d %b %Y') }}</p>
+                <p>Status: <strong>{{ r.status|title }}</strong></p>
+
+                {% if r.status == 'requested' %}
+                <details>
+                    <summary>Edit request</summary>
+                    <form class="inline-form" method="post"
+                          action="{{ url_for('edit_pottery_request', request_id=r.id) }}">
+                        <label>Pottery item</label>
+                        <select name="item_id" required>
+                            {% for item in items %}
+                            <option value="{{ item.id }}"
+                                {% if item.id == r.item_id %}selected{% endif %}>
+                                {{ item.item_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <label>Glaze</label>
+                        <select name="glaze_id" required>
+                            {% for glaze in glazes %}
+                            <option value="{{ glaze.id }}"
+                                {% if glaze.id == r.glaze_id %}selected{% endif %}>
+                                {{ glaze.glaze_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" min="1" max="12"
+                               value="{{ r.quantity }}" required>
+
+                        <label>Required by</label>
+                        <input type="date" name="needed_by"
+                               min="{{ today_plus_14 }}"
+                               value="{{ r.needed_by.isoformat() }}" required>
+
+                        <button type="submit">Save changes</button>
+                    </form>
+                </details>
+
+                <form method="post"
+                      action="{{ url_for('cancel_pottery_request', request_id=r.id) }}"
+                      onsubmit="return confirm('Cancel this pottery request?');">
+                    <button class="secondary" type="submit">Cancel request</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>You haven't submitted any pottery requests yet.</p>
+        {% endif %}
+    </section>
+</body>
+</html>
